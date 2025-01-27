@@ -4,7 +4,6 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+        // Lista de Futbolistas
         List<Futbolista> futbolistas = new ArrayList<>();
 
         futbolistas.add(new Futbolista("Iker", "Casillas", 33, Arrays.asList("Portero"), true));
@@ -26,7 +26,7 @@ public class Main {
         futbolistas.add(new Futbolista("Leo", "Baptistao", 22, Arrays.asList("Delantero"), false));
 
         // Conexión al servidor de MongoDB
-        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://admin:admin123@localhost:27017")) {
 
             // Conexión a la base de datos "Futbol"
             MongoDatabase database = mongoClient.getDatabase("Futbol");
@@ -47,14 +47,15 @@ public class Main {
             System.out.println("Número de documentos en la colección Futbolistas: " + numDocumentos + "\n");
 
             // Imprimimos todos los documentos
+            System.out.println("Documentos en la colección:");
             collection.find().forEach(doc -> System.out.println(doc.toJson()));
 
             // PASO 4.2.2: "READ" -> Buscar jugadores que jueguen en la posición de "Delantero"
             System.out.println("\nFutbolistas que juegan en la posición de Delantero:");
             collection.find(Filters.regex("demarcacion", "Delantero"))
                     .forEach(doc -> {
-                        Futbolista futbolista = Futbolista.fromDocument(doc);
-                        System.out.println(futbolista);
+                        Futbolista futbolista = new Futbolista(doc);
+                        System.out.println(futbolista.toString());
                     });
 
             // PASO 4.3: "UPDATE" -> Incrementar edad en 100 años para jugadores mayores de 30 años

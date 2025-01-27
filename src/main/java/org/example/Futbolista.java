@@ -1,22 +1,22 @@
 package org.example;
 
-import java.util.ArrayList;
+import org.bson.Document;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Futbolista {
 
     private String nombre;
     private String apellidos;
     private Integer edad;
-    private ArrayList<String> demarcacion;
+    private List<String> demarcacion;
     private Boolean internacional;
 
     public Futbolista() {
     }
 
-    public Futbolista(String nombre, String apellidos, Integer edad, ArrayList<String> demarcacion, Boolean internacional) {
+    public Futbolista(String nombre, String apellidos, Integer edad, List<String> demarcacion, Boolean internacional) {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.edad = edad;
@@ -24,34 +24,20 @@ public class Futbolista {
         this.internacional = internacional;
     }
 
-    // Transformo un objecto que me da MongoDB a un Objecto Java
-    public Futbolista(BasicDBObject dBObjectFutbolista) {
-        this.nombre = dBObjectFutbolista.getString("nombre");
-        this.apellidos = dBObjectFutbolista.getString("apellidos");
-        this.edad = dBObjectFutbolista.getInt("edad");
-
-        // Cuidado cuando trabajamos con Arrays o Listas
-        BasicDBList listDemarcaciones = (BasicDBList) dBObjectFutbolista.get("demarcacion");
-        this.demarcacion = new ArrayList<String>();
-        for (Object demarc : listDemarcaciones) {
-            this.demarcacion.add(demarc.toString());
-        }
-
-        this.internacional = dBObjectFutbolista.getBoolean("internacional");
+    public Futbolista(Document document) {
+        this.nombre = document.getString("nombre");
+        this.apellidos = document.getString("apellidos");
+        this.edad = document.getInteger("edad");
+        this.demarcacion = document.getList("demarcacion", String.class);
+        this.internacional = document.getBoolean("internacional");
     }
 
-    public BasicDBObject toDBObjectFutbolista() {
-
-        // Creamos una instancia BasicDBObject
-        BasicDBObject dBObjectFutbolista = new BasicDBObject();
-
-        dBObjectFutbolista.append("nombre", this.getNombre());
-        dBObjectFutbolista.append("apellidos", this.getApellidos());
-        dBObjectFutbolista.append("edad", this.getEdad());
-        dBObjectFutbolista.append("demarcacion", this.getDemarcacion());
-        dBObjectFutbolista.append("internacional", this.getInternacional());
-
-        return dBObjectFutbolista;
+    public Document toDocument() {
+        return new Document("nombre", this.nombre)
+                .append("apellidos", this.apellidos)
+                .append("edad", this.edad)
+                .append("demarcacion", this.demarcacion)
+                .append("internacional", this.internacional);
     }
 
     public String getNombre() {
@@ -78,11 +64,11 @@ public class Futbolista {
         this.edad = edad;
     }
 
-    public ArrayList<String> getDemarcacion() {
+    public List<String> getDemarcacion() {
         return demarcacion;
     }
 
-    public void setDemarcacion(ArrayList<String> demarcacion) {
+    public void setDemarcacion(List<String> demarcacion) {
         this.demarcacion = demarcacion;
     }
 
@@ -96,6 +82,9 @@ public class Futbolista {
 
     @Override
     public String toString() {
-        return "Nombre: " + this.getNombre() + " " + this.getApellidos() + " / Edad: " + this.edad + " / Demarcación: " + this.demarcacion.toString() + " / Internacional: " + this.internacional;
+        return "Nombre: " + this.getNombre() + " " + this.getApellidos() +
+                " / Edad: " + this.edad +
+                " / Demarcación: " + this.demarcacion.toString() +
+                " / Internacional: " + this.internacional;
     }
 }
